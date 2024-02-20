@@ -1,0 +1,44 @@
+version: '3'
+name: inception
+
+services:
+  nginx:
+    container_name: inception_nginx
+    build: 
+      context: requirements/nginx/
+    ports:
+      - "8080:80"
+      - "443:443"
+    networks:
+      - inception
+    restart: always
+  
+  # wordpress:
+  #   container_name: wordpress
+  #   build:
+  #     context: requirements/wordpress/
+  #   volumes:
+  #     - wordpress:/var/www/html
+  #   restart: always
+  
+  database:
+    container_name: inception_database
+    build: 
+      context: requirements/mariadb/
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - inception
+    restart: always
+
+networks:
+  inception:
+
+volumes:
+  db_data:
+    name: inception_db_data
+    driver: local
+
+  wordpress:
+    name: inception_wordpress
+    driver: local
