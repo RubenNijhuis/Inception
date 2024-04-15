@@ -4,41 +4,63 @@ name: inception
 services:
   nginx:
     container_name: inception_nginx
+    depends_on:
+      - wordpress
     build: 
       context: requirements/nginx/
+    volumes:
+      - html:/var/www/html
     ports:
-      - "8080:80"
+      - "8080:8080"
       - "443:443"
     networks:
       - inception
     restart: always
   
-  # wordpress:
-  #   container_name: wordpress
-  #   build:
-  #     context: requirements/wordpress/
-  #   volumes:
-  #     - wordpress:/var/www/html
-  #   restart: always
+  wordpress:
+    container_name: inception_wordpress
+    build:
+      context: requirements/wordpress/
+    volumes:
+      - html:/var/www/html
+    networks:
+      - inception
+    ports:
+      - "9000:9000"
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env
+    restart: always
   
   database:
     container_name: inception_database
-    build: 
-      context: requirements/mariadb/
+    build: requirements/mariadb
     volumes:
-      - db_data:/var/lib/mysql
+      - database:/var/lib/mysql
     networks:
       - inception
     restart: always
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 1s
+      retries: 10
+    env_file:
+      - .env
 
 networks:
   inception:
+    name: inception
+    driver: bridge
 
 volumes:
-  db_data:
-    name: inception_db_data
+  database:
+    name: inception_database
     driver: local
 
-  wordpress:
-    name: inception_wordpress
+  html:
+    name: inception_html
     driver: local
