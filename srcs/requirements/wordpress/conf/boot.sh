@@ -56,7 +56,7 @@ else
                     --admin_user="$WP_ADMIN_NAME" \
                     --admin_password="$WP_ADMIN_PASS" \
                     --admin_email="admin@admin.com" \
-                    --url="http://nginx.inception.orb.local/" \
+                    --url="https://rnijhuis.codam.nl/" \
                     --skip-email \
                     --allow-root
 

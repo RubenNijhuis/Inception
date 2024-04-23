@@ -1,22 +1,19 @@
-version: '3'
-name: inception
+version: "3.3"
 
 services:
   nginx:
     container_name: inception_nginx
     depends_on:
       - wordpress
-    build: 
+    build:
       context: requirements/nginx/
     volumes:
       - html:/var/www/html
     ports:
-      - "8080:8080"
       - "443:443"
     networks:
       - inception
-    restart: always
-  
+
   wordpress:
     container_name: inception_wordpress
     build:
@@ -29,11 +26,11 @@ services:
       - "9000:9000"
     depends_on:
       database:
-        condition: service_healthy
+         condition: service_healthy
     env_file:
       - .env
     restart: always
-  
+
   database:
     container_name: inception_database
     build: requirements/mariadb
@@ -58,9 +55,13 @@ networks:
 
 volumes:
   database:
-    name: inception_database
-    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/db
 
   html:
-    name: inception_html
-    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/wp
